@@ -15,7 +15,7 @@ const examples:Record<Kind,string> = {
 
 const rules = [
   {re:/urgent|immediately|act now|today|suspend|blocked|dernier avertissement|vite|عاجل|حالاً|ديركت/gi,pts:18,label:'Pressure or urgent language'},
-  {re:/password|mot de passe|pin|otp|verification code|كلمة السر|رمز|كود/gi,pts:25,label:'Requests sensitive security information'},
+  {re:/\b(?:password|mot de passe|pin|otp|verification code)\b|كلمة السر|رمز|كود/gi,pts:25,label:'Requests sensitive security information'},
   {re:/prize|winner|giveaway|lottery|cadeau|gagné|ربحت|هدية/gi,pts:20,label:'Unexpected prize or giveaway'},
   {re:/send money|pay|payment|transfer|wire|crypto|gift card|ادفع|حوّل|خلص/gi,pts:18,label:'Requests money or payment'},
   {re:/remote job|easy income|work from home|visa|immigration|scholarship|emploi|bourse|منحة|فيزا/gi,pts:16,label:'High-risk offer or opportunity'},
@@ -25,8 +25,9 @@ const rules = [
 
 function analyze(text:string):Result {
   let score=3; const signs:string[]=[]; const matches:string[]=[];
-  for(const rule of rules){ const found=text.match(rule.re); if(found){ score+=rule.pts; signs.push(rule.label); matches.push(...found); }}
   const urls=text.match(/(?:https?:\/\/|www\.)[^\s<]+/gi)||[];
+  const prose=text.replace(/(?:https?:\/\/|www\.)[^\s<]+/gi,' ');
+  for(const rule of rules){ const found=prose.match(rule.re); if(found){ score+=rule.pts; signs.push(rule.label); matches.push(...found); }}
   for(const raw of urls){
     if(/^http:\/\//i.test(raw)){score+=14; signs.push('Link does not use secure HTTPS');}
     if(/(?:bit\.ly|tinyurl|t\.co|cutt\.ly|shorturl)/i.test(raw)){score+=18;signs.push('Shortened link hides its destination');}
