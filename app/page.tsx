@@ -10,7 +10,7 @@ const Shield = ({check=true}:{check?:boolean}) => <span className="shield" aria-
 const kinds:Kind[] = ['Message','URL','Screenshot','QR code'];
 const examples:Record<Kind,string> = {
   Message:'URGENT: Your BaridiMob account will be suspended today. Verify your OTP and password now at http://baridimob-support.top/login',
-  URL:'http://algerie-poste.verify-account.top/login.php', Screenshot:'Suspicious delivery notice: Pay 150 DA now to release your parcel.', QR:'http://192.168.1.55/secure-login.exe'
+  URL:'http://algerie-poste.verify-account.top/login.php', Screenshot:'Suspicious delivery notice: Pay 150 DA now to release your parcel.', 'QR code':'http://192.168.1.55/secure-login.exe'
 };
 
 const rules = [
