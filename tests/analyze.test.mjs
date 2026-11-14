@@ -34,3 +34,29 @@ test('score is capped at 100', () => {
   assert.equal(r.score, 100);
   assert.equal(r.level, 'Dangerous');
 });
+
+test('ordinary domains ending in "t.co…" are not treated as link shorteners', () => {
+  for (const url of ['https://www.microsoft.com/en-us/security', 'https://att.com/support']) {
+    assert.ok(!analyze(url).signs.includes('Shortened link hides its destination'), url);
+  }
+});
+
+test('real shortener hosts are still flagged', () => {
+  for (const url of ['http://bit.ly/abc', 'https://t.co/xyz', 'https://tinyurl.com/x', 'www.cutt.ly/y']) {
+    assert.ok(analyze(url).signs.includes('Shortened link hides its destination'), url);
+  }
+});
+
+test('keywords inside other words do not trigger rules', () => {
+  assert.deepEqual(analyze('Thanks for the invite to dinner').signs, []);
+  assert.deepEqual(analyze('I can repay you next week').signs, []);
+  assert.deepEqual(analyze('Lovely visage in that portrait').signs, []);
+});
+
+test('keyword plurals and French/Arabic terms still match', () => {
+  assert.ok(analyze('Claim your prizes now').signs.includes('Unexpected prize or giveaway'));
+  assert.ok(analyze('Vous avez gagné un cadeau').signs.includes('Unexpected prize or giveaway'));
+  assert.ok(analyze('Répondez vite').signs.includes('Pressure or urgent language'));
+  assert.ok(analyze('ربحت هدية').signs.includes('Unexpected prize or giveaway'));
+  assert.ok(analyze('Pay 150 DA now to release your parcel.').signs.includes('Requests money or payment'));
+});
