@@ -1,5 +1,7 @@
 # ScamShield
 
+[![CI](https://github.com/spoukidev/scamshield/actions/workflows/ci.yml/badge.svg)](https://github.com/spoukidev/scamshield/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 ScamShield is a responsive web application that helps people assess suspicious messages, links, screenshots, and QR codes. It provides an understandable risk classification, explains the warning signs it found, and recommends practical next steps.
 
 ![ScamShield social preview](public/og.png)
@@ -47,8 +49,8 @@ The rules include locally relevant scam patterns involving Algérie Poste, Barid
 ### Installation
 
 ```bash
-git clone https://github.com/spoukidev/Secure_Link.git
-cd Secure_Link
+git clone https://github.com/spoukidev/scamshield.git
+cd scamshield
 npm install
 ```
 
