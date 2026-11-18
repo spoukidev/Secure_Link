@@ -27,7 +27,9 @@ function hostnameOf(raw:string):string {
 
 export function analyze(text:string):Result {
   let score=3; const signs:string[]=[]; const matches:string[]=[];
-  const urls=text.match(/(?:https?:\/\/|www\.)[^\s<]+/gi)||[];
+  // Drop sentence punctuation glued to the end of a link ("…/login." or "(…/x)") so
+  // the domain and file-type checks below see the real URL.
+  const urls=(text.match(/(?:https?:\/\/|www\.)[^\s<]+/gi)||[]).map(u=>u.replace(/[.,;:!?)\]}'"»]+$/,'')).filter(Boolean);
   const prose=text.replace(/(?:https?:\/\/|www\.)[^\s<]+/gi,' ');
   for(const rule of rules){ const found=prose.match(rule.re); if(found){ score+=rule.pts; signs.push(rule.label); matches.push(...found); }}
   for(const raw of urls){

@@ -60,3 +60,11 @@ test('keyword plurals and French/Arabic terms still match', () => {
   assert.ok(analyze('ربحت هدية').signs.includes('Unexpected prize or giveaway'));
   assert.ok(analyze('Pay 150 DA now to release your parcel.').signs.includes('Requests money or payment'));
 });
+
+test('punctuation after a link does not hide its domain', () => {
+  for (const text of ['Pay here: http://baridimob-support.top.', 'Login (https://edahabia-pay.xyz)', 'Open https://evil.click/a.exe!']) {
+    const r = analyze(text);
+    assert.ok(r.signs.includes('Unusual or dangerous domain/file type'), text);
+    assert.ok(!/[.)!]$/.test(r.links[0]), r.links[0]);
+  }
+});
