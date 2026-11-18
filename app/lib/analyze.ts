@@ -21,6 +21,13 @@ const rules = [
 
 const SHORTENER_HOSTS = /^(?:www\.)?(?:bit\.ly|tinyurl\.com|t\.co|cutt\.ly|shorturl\.at|is\.gd|goo\.gl|ow\.ly|rb\.gy)$/i;
 
+// Links with a scheme or "www.", plus bare domains on common or scam-heavy TLDs
+// ("bit.ly/x", "baridimob-dz.top/login"), which SMS scams often use without "http".
+// Bare .zip/.mov are left out so file names in prose are not read as links, and a
+// preceding "@" or word character keeps e-mail addresses out.
+const BARE_TLDS = 'com|net|org|info|biz|dz|fr|ly|co|io|me|gd|at|top|xyz|click|work|site|online|shop|live|link|app|icu|buzz|cc|tk|ml|ga|cf|gq|ru|cn';
+const LINK_RE = new RegExp(`(?:https?:\\/\\/|www\\.)[^\\s<]+|(?<![@\\w.-])(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+(?:${BARE_TLDS})(?![\\w-])(?:[/?#][^\\s<]*)?`, 'gi');
+
 function hostnameOf(raw:string):string {
   try { return new URL(/^https?:\/\//i.test(raw) ? raw : `http://${raw}`).hostname; } catch { return ''; }
 }
@@ -29,8 +36,8 @@ export function analyze(text:string):Result {
   let score=3; const signs:string[]=[]; const matches:string[]=[];
   // Drop sentence punctuation glued to the end of a link ("…/login." or "(…/x)") so
   // the domain and file-type checks below see the real URL.
-  const urls=(text.match(/(?:https?:\/\/|www\.)[^\s<]+/gi)||[]).map(u=>u.replace(/[.,;:!?)\]}'"»]+$/,'')).filter(Boolean);
-  const prose=text.replace(/(?:https?:\/\/|www\.)[^\s<]+/gi,' ');
+  const urls=(text.match(LINK_RE)||[]).map(u=>u.replace(/[.,;:!?)\]}'"»]+$/,'')).filter(Boolean);
+  const prose=text.replace(LINK_RE,' ');
   for(const rule of rules){ const found=prose.match(rule.re); if(found){ score+=rule.pts; signs.push(rule.label); matches.push(...found); }}
   for(const raw of urls){
     if(/^http:\/\//i.test(raw)){score+=14; signs.push('Link does not use secure HTTPS');}

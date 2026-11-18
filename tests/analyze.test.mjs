@@ -68,3 +68,18 @@ test('punctuation after a link does not hide its domain', () => {
     assert.ok(!/[.)!]$/.test(r.links[0]), r.links[0]);
   }
 });
+
+test('bare domains without http or www are analyzed as links', () => {
+  const r = analyze('Votre colis est bloqué, payez 150 DA sur algerie-poste.top/pay');
+  assert.deepEqual(r.links, ['algerie-poste.top/pay']);
+  assert.ok(r.signs.includes('Unusual or dangerous domain/file type'));
+  assert.ok(r.signs.includes('Domain may imitate a known organization'));
+  assert.ok(analyze('Claim it: bit.ly/3xYz').signs.includes('Shortened link hides its destination'));
+});
+
+test('e-mail addresses, file names and plain prose are not read as bare links', () => {
+  assert.deepEqual(analyze('Write to support@example.com please').links, []);
+  assert.deepEqual(analyze('I attached holiday.mov and photos.zip').links, []);
+  assert.deepEqual(analyze('See you at 5. Thanks, ok.').links, []);
+  assert.equal(analyze('Read the docs at example.com/help').level, 'Safe');
+});
